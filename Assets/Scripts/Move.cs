@@ -13,6 +13,9 @@ public class Move : MonoBehaviour
     void Welcome(){
         
         Debug.Log("Welcome to the game!");
+        Debug.Log("Control the player using WASD or Arrow keys");
+        Debug.Log("Avoid the obstacles");
+        Debug.Log("Good luck!");   
     }
 
     // Update is called once per frame
