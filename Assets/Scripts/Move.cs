@@ -10,6 +10,15 @@ public class Move : MonoBehaviour
         Welcome();
     }
 
+    
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    
+    
     void Welcome(){
         
         Debug.Log("Welcome to the game!");
@@ -18,9 +27,7 @@ public class Move : MonoBehaviour
         Debug.Log("Good luck!");   
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    void MovePlayer(){
         float valueX = 0f;
         float valueZ = 0f;
 
