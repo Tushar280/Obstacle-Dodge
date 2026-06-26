@@ -25,7 +25,7 @@ public class Move : MonoBehaviour
         }
 
         float valueY = 0;
-        transform.Translate(valueX * playerSpeed, valueY, valueZ * playerSpeed);
+        transform.Translate(valueX * playerSpeed * Time.deltaTime, valueY, valueZ * playerSpeed * Time.deltaTime);
     }
 }
 
