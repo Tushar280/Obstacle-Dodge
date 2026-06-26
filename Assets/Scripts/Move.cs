@@ -7,7 +7,12 @@ public class Move : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Welcome();
+    }
+
+    void Welcome(){
         
+        Debug.Log("Welcome to the game!");
     }
 
     // Update is called once per frame
