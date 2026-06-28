@@ -2,15 +2,14 @@ using UnityEngine;
 
 public class dropper : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public int timer = 3;
+    public Rigidbody rigidBody;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if(Time.time > timer)
+        {
+            rigidBody.useGravity = true;
+        }
     }
 }
