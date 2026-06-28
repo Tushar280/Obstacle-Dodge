@@ -12,9 +12,11 @@ public class PlayerHit : MonoBehaviour
         hitCount++;
         Debug.Log("Total hits = " + hitCount + " on player");
 
-        if(collision.gameObject.CompareTag == "Obstacle")
+        if(collision.gameObject.CompareTag("Obstacle"))
         {
-            
+            MeshRenderer meshRenderer = collision.gameObject.GetComponent<MeshRenderer>();
+            Material material = meshRenderer.material;
+            material.color = Color.red;
         }
     }
 }
