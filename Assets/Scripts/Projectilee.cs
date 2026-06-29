@@ -2,15 +2,27 @@ using UnityEngine;
 
 public class Projectilee : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Transform player;
+    private Vector3 playerPosition;
+    public float speed;
+
+    private void Start()
     {
-        
+        playerPosition = player.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        transform.position = Vector3.MoveTowards(transform.position , playerPosition , speed * Time.deltaTime);
+
+        if(transform.position == playerPosition)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Vector3.MoveTowards(transform.position , playerPosition , speed * Time.deltaTime);
+        }
     }
+
 }
