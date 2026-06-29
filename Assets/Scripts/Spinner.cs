@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class Spinner : MonoBehaviour
 {
+    [SerializeField] float spinX;
+    [SerializeField] float spinY;
+    [SerializeField] float spinZ;
+
     void Update()
     {
-        transform.Rotate(15, 30, 45);
+        transform.Rotate(spinX, spinY, spinZ);
     }
 }
