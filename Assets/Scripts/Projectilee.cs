@@ -14,15 +14,14 @@ public class Projectilee : MonoBehaviour
     private void Update()
     {
         transform.position = Vector3.MoveTowards(transform.position , playerPosition , speed * Time.deltaTime);
-
-        if(transform.position == playerPosition)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Vector3.MoveTowards(transform.position , playerPosition , speed * Time.deltaTime);
-        }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Player"))
+        {
+            Destroy(gameObject);
+            Debug.Log("Player has been hit by projectile");
+        }
+    }
 }
