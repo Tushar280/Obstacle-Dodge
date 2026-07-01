@@ -24,9 +24,15 @@ public class PlayerHit : MonoBehaviour
             Material material = meshRenderer.material;
             material.color = Color.red;
 
-            rb.constraints = RigidbodyConstraints.None;
-            //rb.useGravity = true;
-            moveScript.enabled = false;
+            GameOver();
         }
+    }
+
+    private bool GameOver(){
+        rb.constraints = RigidbodyConstraints.None;
+        rb.useGravity = true;
+        moveScript.enabled = false;
+
+        return true;
     }
 }
