@@ -3,7 +3,13 @@ using UnityEngine;
 public class PlayerHit : MonoBehaviour
 {
     private int hitCount = 0;
+    private Rigidbody rb;
+    private Move moveScript;
 
+    private void Start(){
+        rb = GetComponent<Rigidbody>();
+        moveScript = GetComponent<Move>();
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -17,6 +23,10 @@ public class PlayerHit : MonoBehaviour
             MeshRenderer meshRenderer = collision.gameObject.GetComponent<MeshRenderer>();
             Material material = meshRenderer.material;
             material.color = Color.red;
+
+            rb.constraints = RigidbodyConstraints.None;
+            //rb.useGravity = true;
+            moveScript.enabled = false;
         }
     }
 }
