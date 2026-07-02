@@ -60,6 +60,43 @@ public class Gamewintrigger : MonoBehaviour
         GUI.Label(rect, text, style);
     }
 
+    private bool DrawGlitchedButton(Rect rect, string text)
+    {
+        bool isHovering = rect.Contains(Event.current.mousePosition);
+        Color textBaseColor = isHovering ? new Color(0.95f, 0.98f, 1f, 1f) : new Color(0.7f, 0.78f, 0.88f, 0.85f);
+
+        Matrix4x4 originalMatrix = GUI.matrix;
+        Vector2 btnPivot = new Vector2(rect.x + rect.width / 2f, rect.y + rect.height / 2f);
+
+        // 1. Draw background serif text (Tall & Thin)
+        GUIUtility.ScaleAroundPivot(new Vector2(0.65f, 1.9f), btnPivot);
+        GUIStyle bgStyle = new GUIStyle();
+        bgStyle.alignment = TextAnchor.MiddleCenter;
+        bgStyle.font = serifFont;
+        bgStyle.fontSize = 55;
+        bgStyle.normal.textColor = new Color(textBaseColor.r, textBaseColor.g, textBaseColor.b, textBaseColor.a * 0.8f);
+        GUI.Label(rect, text, bgStyle);
+
+        // Restore matrix
+        GUI.matrix = originalMatrix;
+
+        // 2. Draw foreground sans-serif text (Wide & Shorter)
+        GUIUtility.ScaleAroundPivot(new Vector2(1.1f, 0.85f), btnPivot);
+        GUIStyle fgStyle = new GUIStyle();
+        fgStyle.alignment = TextAnchor.MiddleCenter;
+        fgStyle.font = sansFont;
+        fgStyle.fontSize = 35;
+        fgStyle.fontStyle = FontStyle.Bold;
+        fgStyle.normal.textColor = new Color(textBaseColor.r * 0.9f, textBaseColor.g * 0.95f, textBaseColor.b * 1f, textBaseColor.a * 0.95f);
+        GUI.Label(rect, text, fgStyle);
+
+        // Restore matrix
+        GUI.matrix = originalMatrix;
+
+        // 3. Invisible button overlay to capture interaction
+        return GUI.Button(rect, "", GUIStyle.none);
+    }
+
     private void OnGUI()
     {
         if (isGameWon)
@@ -93,21 +130,14 @@ public class Gamewintrigger : MonoBehaviour
             // Restore Matrix for drawing UI buttons
             GUI.matrix = originalMatrix;
 
-            // 4. Draw Exit Button at the bottom (without matrix distortion)
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-            buttonStyle.alignment = TextAnchor.MiddleCenter;
-            buttonStyle.fontSize = 20;
-            buttonStyle.font = sansFont;
-            buttonStyle.fontStyle = FontStyle.Bold;
-            buttonStyle.normal.textColor = new Color(0.1f, 0.1f, 0.1f);
-            buttonStyle.hover.textColor = new Color(0.3f, 0.3f, 0.3f);
-
-            float btnWidth = 180f;
-            float btnHeight = 50f;
+            // 4. Draw EXIT Button (Glitched Style) at the bottom
+            float btnWidth = 300f;
+            float btnHeight = 80f;
             float btnX = (Screen.width - btnWidth) / 2f;
-            float btnY = Screen.height - 100f; // Bottom center placement
+            float btnY = Screen.height - 130f; // Bottom center placement
+            Rect btnRect = new Rect(btnX, btnY, btnWidth, btnHeight);
 
-            if (GUI.Button(new Rect(btnX, btnY, btnWidth, btnHeight), "EXIT GAME", buttonStyle))
+            if (DrawGlitchedButton(btnRect, "EXIT"))
             {
                 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
