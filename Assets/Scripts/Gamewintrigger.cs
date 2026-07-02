@@ -1,63 +1,11 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.SceneManagement;
 
-public class PlayerHit : MonoBehaviour
+public class Gamewintrigger : MonoBehaviour
 {
-    private int hitCount = 0;
-    private Rigidbody rb;
-    private Move moveScript;
-    private bool isGameOver = false;
+    private bool isGameWon = false;
     private Font serifFont;
     private Font sansFont;
-
-    private void Start(){
-        rb = GetComponent<Rigidbody>();
-        moveScript = GetComponent<Move>();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        //Debug.Log("Player has been hit!");
-        //Debug.Log(collision.gameObject.name + " hit the player");
-        hitCount++;
-        Debug.Log("Total hits = " + hitCount + " on player");
-
-        if(collision.gameObject.CompareTag("Obstacle"))
-        {
-            MeshRenderer meshRenderer = collision.gameObject.GetComponent<MeshRenderer>();
-            Material material = meshRenderer.material;
-            material.color = Color.red;
-
-            GameOver();
-        }
-    }
-
-    private bool GameOver(){
-        if (isGameOver) return false;
-        isGameOver = true;
-        // Apply physical game over state (make player fall and stop movement)
-        if (rb != null)
-        {
-            rb.constraints = RigidbodyConstraints.None;
-            rb.useGravity = true;
-        }
-        
-        if (moveScript != null)
-        {
-            moveScript.enabled = false;
-        }
-        // Start the respawn sequence after a short delay
-        StartCoroutine(RespawnSequence());
-        return true;
-    }
-    private IEnumerator RespawnSequence()
-    {
-        // Wait for 2 seconds to allow the player to see the "Game Over" message
-        yield return new WaitForSeconds(2f);
-        // Reload the current scene to reset the player and all obstacle timers/states
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
 
     private void InitializeFonts()
     {
@@ -71,9 +19,27 @@ public class PlayerHit : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isGameWon = true;
+            Move moveScript = other.GetComponent<Move>();
+            if (moveScript != null)
+            {
+                moveScript.enabled = false;
+            }
+            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+            }
+        }
+    }
+
     private void OnGUI()
     {
-        if (isGameOver)
+        if (isGameWon)
         {
             InitializeFonts();
 
@@ -108,8 +74,8 @@ public class PlayerHit : MonoBehaviour
             // Simple shadow for the background text
             GUIStyle bgShadowStyle = new GUIStyle(bgStyle);
             bgShadowStyle.normal.textColor = new Color(0.1f, 0.1f, 0.1f, 0.5f);
-            GUI.Label(new Rect(rect.x + 2, rect.y + 2, rect.width, rect.height), "YOU DIED", bgShadowStyle);
-            GUI.Label(rect, "YOU DIED", bgStyle);
+            GUI.Label(new Rect(rect.x + 2, rect.y + 2, rect.width, rect.height), "YOU WIN", bgShadowStyle);
+            GUI.Label(rect, "YOU WIN", bgStyle);
 
             // Restore Matrix for foreground text
             GUI.matrix = originalMatrix;
@@ -131,18 +97,42 @@ public class PlayerHit : MonoBehaviour
             // Chromatic Aberration offset labels:
             // Red offset
             fgStyle.normal.textColor = new Color(0.9f, 0.1f, 0.1f, 0.6f);
-            GUI.Label(new Rect(rect.x + 3, rect.y, rect.width, rect.height), "YOU DIED", fgStyle);
+            GUI.Label(new Rect(rect.x + 3, rect.y, rect.width, rect.height), "YOU WIN", fgStyle);
 
             // Cyan/Blue offset
             fgStyle.normal.textColor = new Color(0.1f, 0.9f, 0.9f, 0.6f);
-            GUI.Label(new Rect(rect.x - 3, rect.y, rect.width, rect.height), "YOU DIED", fgStyle);
+            GUI.Label(new Rect(rect.x - 3, rect.y, rect.width, rect.height), "YOU WIN", fgStyle);
 
             // Main foreground white text
             fgStyle.normal.textColor = new Color(0.95f, 0.95f, 0.98f, 0.95f);
-            GUI.Label(rect, "YOU DIED", fgStyle);
+            GUI.Label(rect, "YOU WIN", fgStyle);
 
             // Restore original GUI matrix
             GUI.matrix = originalMatrix;
+
+            // 6. Draw Exit Button at the bottom (without matrix distortion)
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.alignment = TextAnchor.MiddleCenter;
+            buttonStyle.fontSize = 20;
+            buttonStyle.font = sansFont;
+            buttonStyle.fontStyle = FontStyle.Bold;
+            buttonStyle.normal.textColor = Color.white;
+            buttonStyle.hover.textColor = new Color(0.9f, 0.9f, 0.9f);
+
+            float btnWidth = 180f;
+            float btnHeight = 50f;
+            float btnX = (Screen.width - btnWidth) / 2f;
+            float btnY = Screen.height / 2f + 120f;
+
+            if (GUI.Button(new Rect(btnX, btnY, btnWidth, btnHeight), "EXIT GAME", buttonStyle))
+            {
+                #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+                #else
+                Application.Quit();
+                #endif
+            }
         }
     }
 }
+
