@@ -63,12 +63,38 @@ public class PlayerHit : MonoBehaviour
     {
         if (serifFont == null)
         {
-            serifFont = Font.CreateDynamicFontFromOSFont(new string[] { "Georgia", "Times New Roman", "Times" }, 110);
+            serifFont = Resources.Load<Font>("Fonts/IAmMusic");
+            if (serifFont == null)
+            {
+                serifFont = Font.CreateDynamicFontFromOSFont(new string[] { "Georgia", "Times New Roman", "Times" }, 110);
+            }
         }
         if (sansFont == null)
         {
             sansFont = Font.CreateDynamicFontFromOSFont(new string[] { "Arial", "Helvetica", "Verdana", "sans-serif" }, 65);
         }
+    }
+
+    private void DrawSmudgedLabel(Rect rect, string text, GUIStyle style)
+    {
+        Color originalColor = style.normal.textColor;
+        int steps = 14;
+        float blurAmount = 18f;
+
+        for (int i = 0; i <= steps; i++)
+        {
+            float t = (float)i / steps;
+            float offset = (t * 2f - 1f) * (blurAmount / 2f);
+            float dist = Mathf.Abs(offset) / (blurAmount / 2f);
+            float alphaFactor = Mathf.Clamp01(1f - dist * dist);
+            
+            style.normal.textColor = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * alphaFactor * 0.12f);
+            // Offset horizontally (rect.x) since the text is horizontal now
+            GUI.Label(new Rect(rect.x + offset, rect.y, rect.width, rect.height), text, style);
+        }
+
+        style.normal.textColor = originalColor;
+        GUI.Label(rect, text, style);
     }
 
     private void OnGUI()
@@ -79,67 +105,27 @@ public class PlayerHit : MonoBehaviour
 
             Rect rect = new Rect(0, 0, Screen.width, Screen.height);
 
-            // 1. Draw solid black background
+            // 1. Draw solid off-white/light gray background
             Color originalGUIColor = GUI.color;
-            GUI.color = Color.black;
+            GUI.color = new Color(0.92f, 0.92f, 0.92f, 1f);
             GUI.DrawTexture(rect, Texture2D.whiteTexture);
-
-            // 2. Draw subtle horizontal scanlines
-            GUI.color = new Color(0.2f, 0.2f, 0.2f, 0.15f);
-            for (int y = 0; y < Screen.height; y += 4)
-            {
-                GUI.DrawTexture(new Rect(0, y, Screen.width, 2), Texture2D.whiteTexture);
-            }
             GUI.color = originalGUIColor;
 
             Vector2 pivot = new Vector2(Screen.width / 2f, Screen.height / 2f);
             Matrix4x4 originalMatrix = GUI.matrix;
 
-            // 3. Draw background Serif text (Tall & Thin)
-            GUIUtility.ScaleAroundPivot(new Vector2(0.7f, 1.8f), pivot);
+            // 2. Scale to make the text tall and thin (horizontal layout, no rotation)
+            GUIUtility.ScaleAroundPivot(new Vector2(0.7f, 1.9f), pivot);
 
-            GUIStyle bgStyle = new GUIStyle();
-            bgStyle.alignment = TextAnchor.MiddleCenter;
-            bgStyle.font = serifFont;
-            bgStyle.fontSize = 110;
-            bgStyle.fontStyle = FontStyle.Normal;
-            bgStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f, 0.85f);
+            GUIStyle style = new GUIStyle();
+            style.alignment = TextAnchor.MiddleCenter;
+            style.font = serifFont;
+            style.fontSize = 110;
+            style.fontStyle = FontStyle.Normal;
+            style.normal.textColor = new Color(0.08f, 0.08f, 0.08f, 1f); // Solid charcoal/black
 
-            // Simple shadow for the background text
-            GUIStyle bgShadowStyle = new GUIStyle(bgStyle);
-            bgShadowStyle.normal.textColor = new Color(0.1f, 0.1f, 0.1f, 0.5f);
-            GUI.Label(new Rect(rect.x + 2, rect.y + 2, rect.width, rect.height), "YOU DIED", bgShadowStyle);
-            GUI.Label(rect, "YOU DIED", bgStyle);
-
-            // Restore Matrix for foreground text
-            GUI.matrix = originalMatrix;
-
-            // 4. Draw horizontal glitch line in the middle of the screen
-            GUI.color = new Color(1f, 1f, 1f, 0.08f);
-            GUI.DrawTexture(new Rect(0, Screen.height / 2f - 15, Screen.width, 30), Texture2D.whiteTexture);
-            GUI.color = originalGUIColor;
-
-            // 5. Draw foreground Sans-Serif text (Wide & Shorter, with chromatic aberration)
-            GUIUtility.ScaleAroundPivot(new Vector2(1.25f, 0.85f), pivot);
-
-            GUIStyle fgStyle = new GUIStyle();
-            fgStyle.alignment = TextAnchor.MiddleCenter;
-            fgStyle.font = sansFont;
-            fgStyle.fontSize = 65;
-            fgStyle.fontStyle = FontStyle.Bold;
-
-            // Chromatic Aberration offset labels:
-            // Red offset
-            fgStyle.normal.textColor = new Color(0.9f, 0.1f, 0.1f, 0.6f);
-            GUI.Label(new Rect(rect.x + 3, rect.y, rect.width, rect.height), "YOU DIED", fgStyle);
-
-            // Cyan/Blue offset
-            fgStyle.normal.textColor = new Color(0.1f, 0.9f, 0.9f, 0.6f);
-            GUI.Label(new Rect(rect.x - 3, rect.y, rect.width, rect.height), "YOU DIED", fgStyle);
-
-            // Main foreground white text
-            fgStyle.normal.textColor = new Color(0.95f, 0.95f, 0.98f, 0.95f);
-            GUI.Label(rect, "YOU DIED", fgStyle);
+            // 3. Draw the horizontal text with high-fidelity horizontal smear
+            DrawSmudgedLabel(rect, "YOU DIED", style);
 
             // Restore original GUI matrix
             GUI.matrix = originalMatrix;
