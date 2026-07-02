@@ -63,15 +63,12 @@ public class PlayerHit : MonoBehaviour
     {
         if (serifFont == null)
         {
-            serifFont = Resources.Load<Font>("Fonts/IAmMusic");
-            if (serifFont == null)
-            {
-                serifFont = Font.CreateDynamicFontFromOSFont(new string[] { "Georgia", "Times New Roman", "Times" }, 110);
-            }
+            // Load Times New Roman directly (guaranteed to be on Windows and has very sharp serifs)
+            serifFont = Font.CreateDynamicFontFromOSFont("Times New Roman", 120);
         }
         if (sansFont == null)
         {
-            sansFont = Font.CreateDynamicFontFromOSFont(new string[] { "Arial", "Helvetica", "Verdana", "sans-serif" }, 65);
+            sansFont = Font.CreateDynamicFontFromOSFont("Arial", 65);
         }
     }
 
@@ -114,13 +111,13 @@ public class PlayerHit : MonoBehaviour
             Vector2 pivot = new Vector2(Screen.width / 2f, Screen.height / 2f);
             Matrix4x4 originalMatrix = GUI.matrix;
 
-            // 2. Scale to make the text tall and thin (horizontal layout, no rotation)
-            GUIUtility.ScaleAroundPivot(new Vector2(0.7f, 1.9f), pivot);
+            // 2. Scale to make the text tall, thin, and edgy (horizontal layout, no rotation)
+            GUIUtility.ScaleAroundPivot(new Vector2(0.58f, 2.15f), pivot);
 
             GUIStyle style = new GUIStyle();
             style.alignment = TextAnchor.MiddleCenter;
             style.font = serifFont;
-            style.fontSize = 110;
+            style.fontSize = 120;
             style.fontStyle = FontStyle.Normal;
             style.normal.textColor = new Color(0.08f, 0.08f, 0.08f, 1f); // Solid charcoal/black
 
